@@ -18,13 +18,6 @@ A Python pipeline that converts news articles from a Google Sheet into engaging 
 
 ---
 
-## Demo Screenshot
-
-![Demo Screenshot](demo_screenshot.png)
-*Replace with your own screenshot of the Gradio app.*
-
----
-
 ## Getting Started
 
 ### 1. Clone the repository
