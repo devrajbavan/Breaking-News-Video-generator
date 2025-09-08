@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+*.env
+venv/
+ENV/
+*.egg-info/
+
+# Secrets
+service_account.json
+
+# OS files
+.DS_Store
