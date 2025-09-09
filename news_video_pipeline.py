@@ -18,9 +18,10 @@ from bs4 import BeautifulSoup
 from gtts import gTTS
 from moviepy.editor import ImageClip, TextClip, CompositeVideoClip, AudioFileClip, ColorClip
 from PIL import Image, ImageOps
-import gspread
-from google.oauth2.service_account import Credentials
 import gradio as gr
+import os, json
+from google.oauth2.service_account import Credentials
+import gspread
 
 # Download NLTK punkt tokenizer if not present
 try:
@@ -34,12 +35,23 @@ WORKSHEET_NAME = "Sheet1"
 CREDS_FILE = "service_account.json"
 
 #  GOOGLE SHEETS 
-def load_google_sheet(sheet_key, worksheet_name="Sheet1", creds_file="service_account.json"):
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_file(creds_file, scopes=scope)
+def load_google_sheet(sheet_key=None, worksheet_name="Sheet1"):
+    sheet_key = sheet_key or os.environ.get("SHEET_KEY")
+    if not sheet_key:
+        raise RuntimeError("Set SHEET_KEY env var")
+
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly",
+              "https://www.googleapis.com/auth/drive.readonly"]
+
+    svc_json = os.environ.get("SERVICE_ACCOUNT_JSON")
+    if svc_json:
+        info = json.loads(svc_json)
+        creds = Credentials.from_service_account_info(info, scopes=scopes)
+    else:
+        creds = Credentials.from_service_account_file("service_account.json", scopes=scopes)  # local dev only
+
     client = gspread.authorize(creds)
-    sheet = client.open_by_key(sheet_key).worksheet(worksheet_name)
-    return sheet.get_all_records()
+    return client.open_by_key(sheet_key).worksheet(worksheet_name).get_all_records()
 
 #  IMAGE UTILITIES 
 def download_and_fit_image(url, size=(1280, 720), timeout=12):
